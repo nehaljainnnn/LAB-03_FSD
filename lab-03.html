@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insurance Experts — AI-Matched Coverage for Real Life</title>
+<meta name="description" content="Insurance Experts uses AI to match you to the right plan, predict your likely costs, and explain every recommendation in plain language.">
+
+<!-- Tailwind Play CDN + Typography plugin -->
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+<!-- Google Fonts: Space Grotesk (display) + Inter (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: '#0A1F44',
+          navy2: '#0F2E5C',
+          skyblue: '#3E8EF7',
+          paleblue: '#EAF2FE',
+          mist: '#F6F9FE',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          sans: ['Inter', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0; height: 1.5px;
+    background: #3E8EF7;
+    transition: width 0.25s ease;
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  .img-zoom { overflow: hidden; }
+  .img-zoom img { transition: transform 0.6s ease; }
+  .img-zoom:hover img { transform: scale(1.06); }
+
+  details[open] summary .chev { transform: rotate(180deg); }
+  .chev { transition: transform 0.25s ease; }
+
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid #3E8EF7;
+    outline-offset: 2px;
+  }
+
+  /* subtle grid texture for dark sections */
+  .grid-texture {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* animated gauge fill on hover */
+  .gauge-fill { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+  /* drag & drop zone active state */
+  #dropZone.drag-active { border-color: #3E8EF7; background-color: #EAF2FE; }
+</style>
+</head>
+
+<body class="bg-white text-navy antialiased">
+
+<!-- ============ WELCOME BANNER (shown on the 'load' event) ============ -->
+<div id="welcomeBanner" class="hidden bg-skyblue text-navy text-sm text-center py-2.5 px-4">
+  👋 Welcome to Insurance Experts! Scroll down to get your free AI-matched plan in under 6 minutes.
+  <button id="dismissBannerBtn" type="button" class="ml-3 underline font-medium">Dismiss</button>
+</div>
+
+<!-- ============ HEADER + NAV ============ -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-navy/10">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex items-center justify-between h-20">
+
+      <a href="#" class="flex items-center gap-2.5">
+        <span class="w-9 h-9 rounded-lg bg-navy flex items-center justify-center">
+          <svg class="w-5 h-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3.5v5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5v-5L12 3z"/>
+          </svg>
+        </span>
+        <span class="font-display text-lg font-semibold tracking-tight">Insurance Experts</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-9 text-sm text-navy/80">
+        <a href="#match" class="nav-link">Get matched</a>
+        <a href="#problem" class="nav-link">Why us</a>
+        <a href="#how-it-works" class="nav-link">How it works</a>
+        <a href="#plans" class="nav-link">Plans</a>
+        <a href="#learn" class="nav-link">Learn</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-4">
+        <a href="#contact" class="text-sm nav-link text-navy/80">Talk to an expert</a>
+        <a href="#match" class="text-sm bg-navy text-white px-5 py-2.5 rounded-lg hover:bg-skyblue transition-colors duration-300">
+          Get matched free
+        </a>
+      </div>
+
+      <button id="menuBtn" aria-label="Open menu" aria-expanded="false" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-navy/20">
+        <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <nav id="mobileMenu" class="hidden md:hidden pb-6 flex flex-col gap-4 text-sm">
+      <a href="#match" class="py-1">Get matched</a>
+      <a href="#problem" class="py-1">Why us</a>
+      <a href="#how-it-works" class="py-1">How it works</a>
+      <a href="#plans" class="py-1">Plans</a>
+      <a href="#learn" class="py-1">Learn</a>
+      <a href="#faq" class="py-1">FAQ</a>
+      <a href="#contact" class="py-1">Talk to an expert</a>
+      <a href="#match" class="mt-2 text-center bg-navy text-white px-5 py-2.5 rounded-lg">Get matched free</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="relative overflow-hidden bg-navy text-white">
+    <div class="absolute inset-0 grid-texture"></div>
+    <div class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <p class="inline-flex items-center gap-2 text-skyblue text-xs font-medium tracking-wide bg-white/5 border border-white/10 rounded-full px-3.5 py-1.5 mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-skyblue"></span>
+          AI-matched, human-checked
+        </p>
+        <h1 class="font-display text-4xl md:text-5xl lg:text-[3.3rem] font-semibold leading-[1.1] mb-6">
+          Stop guessing which insurance plan you need.
+        </h1>
+        <p class="text-white/70 text-lg leading-relaxed mb-8 max-w-md">
+          Most comparison sites rank plans by price and call it a day. We score every plan against
+          your actual profile, predict what you'll really pay in a bad year, and explain the reasoning —
+          in plain English, not policy jargon.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="#match" class="inline-flex items-center gap-2 bg-skyblue text-navy font-medium px-6 py-3.5 rounded-lg hover:bg-white transition-colors duration-300">
+            Find my plan
+          </a>
+          <a href="#how-it-works" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg border border-white/25 hover:border-white transition-colors duration-300">
+            See how the matching works
+          </a>
+        </div>
+
+        <div class="flex items-center gap-8 mt-12 pt-8 border-t border-white/10">
+          <div>
+            <p class="font-display text-2xl font-semibold">42,000+</p>
+            <p class="text-white/50 text-sm">people matched</p>
+          </div>
+          <div>
+            <p class="font-display text-2xl font-semibold">6 min</p>
+            <p class="text-white/50 text-sm">to get your match</p>
+          </div>
+          <div>
+            <p class="font-display text-2xl font-semibold">92%</p>
+            <p class="text-white/50 text-sm">keep their first match</p>
+          </div>
+        </div>
+      </div>
+
+    <div class="img-zoom rounded-2xl ring-1 ring-white/10">
+  <img
+    src="VIDEOS/imagedomain-1.jpg"
+    alt="An Indian family portrait at home"
+    class="w-full h-[420px] md:h-[520px] object-contain rounded-2xl">
+</div>
+    </div>
+  </section>
+
+  <!-- ============ GET MATCHED (interactive quiz: Local Storage + Geolocation + Canvas + Clipboard + Speech) ============ -->
+  <section id="match" class="max-w-6xl mx-auto px-6 py-20">
+    <div class="max-w-xl mb-10">
+      <p class="text-skyblue text-sm font-medium mb-4">Get matched</p>
+      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight">Answer a few questions, see your match.</h2>
+      <p class="text-navy/70 mt-4">Your answers are saved on this device automatically, so you can close the tab and pick up right where you left off.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10">
+
+      <!-- Form -->
+      <form id="matchForm" class="space-y-5 bg-paleblue rounded-2xl p-8">
+        <div>
+          <label class="block text-sm font-medium mb-1.5" for="matchName">Full name</label>
+          <input id="matchName" type="text" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white" placeholder="e.g. Priya Sharma">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1.5" for="matchAge">Age</label>
+            <input id="matchAge" type="number" min="18" max="90" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white" placeholder="29">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1.5" for="matchDependents">Dependents</label>
+            <input id="matchDependents" type="number" min="0" max="10" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white" placeholder="2">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1.5" for="matchBudget">Monthly budget (₹)</label>
+          <input id="matchBudget" type="number" min="0" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white" placeholder="3500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1.5" for="matchCity">City</label>
+          <div class="flex gap-2">
+            <input id="matchCity" type="text" class="flex-1 rounded-lg border border-navy/15 px-4 py-2.5 bg-white" placeholder="e.g. Bengaluru">
+            <button type="button" id="detectLocationBtn" class="whitespace-nowrap text-sm bg-white border border-navy/20 rounded-lg px-4 hover:border-skyblue transition-colors duration-300">📍 Use my location</button>
+          </div>
+          <p id="locationStatus" class="text-xs text-navy/50 mt-1.5"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1.5" for="matchCategory">I'm interested in</label>
+          <select id="matchCategory" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white">
+            <option value="">Select a category…</option>
+            <option value="health">Health Insurance</option>
+            <option value="life">Life Insurance</option>
+            <option value="family">Family Floater</option>
+            <option value="senior">Senior Citizen Plan</option>
+          </select>
+          <p id="categoryHint" class="text-xs text-navy/50 mt-1.5"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1.5" for="matchNotes">Notes for your advisor (optional)</label>
+          <textarea id="matchNotes" maxlength="200" rows="3" class="w-full rounded-lg border border-navy/15 px-4 py-2.5 bg-white resize-none" placeholder="e.g. I have a pre-existing condition I'd like covered…"></textarea>
+          <p id="notesCount" class="text-xs text-navy/40 mt-1.5">0/200 characters</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3 pt-2">
+          <p id="formError" class="hidden w-full text-xs text-red-600 -mb-2"></p>
+          <button type="submit" class="bg-navy text-white px-6 py-2.5 rounded-lg hover:bg-skyblue transition-colors duration-300">See my match</button>
+          <button type="button" id="clearMatchBtn" class="text-sm border border-navy/20 rounded-lg px-5 py-2.5 hover:border-navy transition-colors duration-300">Clear saved answers</button>
+        </div>
+        <p id="saveStatus" class="text-xs text-navy/40 h-4"></p>
+      </form>
+
+      <!-- Result panel -->
+      <div class="bg-white rounded-2xl border border-navy/10 p-8">
+        <h3 class="font-display text-lg font-semibold mb-4">Your match summary</h3>
+        <canvas id="costCanvas" width="480" height="220" class="w-full mb-6"></canvas>
+        <p id="matchSummaryText" class="text-navy/70 text-sm leading-relaxed mb-6">Fill in the form and click "See my match" to generate your personalized estimate.</p>
+        <div class="flex flex-wrap gap-3">
+          <button type="button" id="copySummaryBtn" class="text-sm border border-navy/20 rounded-lg px-5 py-2.5 hover:border-skyblue transition-colors duration-300">📋 Copy summary</button>
+          <button type="button" id="speakSummaryBtn" class="text-sm border border-navy/20 rounded-lg px-5 py-2.5 hover:border-skyblue transition-colors duration-300">🔊 Read aloud</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROBLEM STATEMENT ============ -->
+  <section id="problem" class="max-w-6xl mx-auto px-6 py-20">
+    <div class="grid md:grid-cols-2 gap-14 items-start">
+      <div>
+        <p class="text-skyblue text-sm font-medium mb-4">The problem</p>
+        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-6">
+          People either overpay for cover they don't need, or under-insure the risks that matter.
+        </h2>
+        <p class="text-navy/70 leading-relaxed max-w-md">
+          Comparison platforms sort by premium alone, with no explanation of fit. Without expert
+          guidance, it's genuinely hard to tell a cheap-but-risky plan from a well-matched one —
+          especially for first-time buyers and growing families.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-5">
+        <div class="bg-paleblue rounded-2xl p-6 hover:bg-skyblue hover:text-white transition-colors duration-300 group">
+          <p class="font-display text-3xl font-semibold mb-2">61%</p>
+          <p class="text-navy/70 group-hover:text-white/85 text-sm transition-colors duration-300">of buyers pick by premium alone, ignoring out-of-pocket risk</p>
+        </div>
+        <div class="bg-paleblue rounded-2xl p-6 hover:bg-skyblue hover:text-white transition-colors duration-300 group">
+          <p class="font-display text-3xl font-semibold mb-2">1 in 3</p>
+          <p class="text-navy/70 group-hover:text-white/85 text-sm transition-colors duration-300">first-time buyers are under-insured for their dependents</p>
+        </div>
+        <div class="bg-paleblue rounded-2xl p-6 hover:bg-skyblue hover:text-white transition-colors duration-300 group">
+          <p class="font-display text-3xl font-semibold mb-2">0</p>
+          <p class="text-navy/70 group-hover:text-white/85 text-sm transition-colors duration-300">explanations given by most comparison sites for their rankings</p>
+        </div>
+        <div class="bg-paleblue rounded-2xl p-6 hover:bg-skyblue hover:text-white transition-colors duration-300 group">
+          <p class="font-display text-3xl font-semibold mb-2">6 min</p>
+          <p class="text-navy/70 group-hover:text-white/85 text-sm transition-colors duration-300">is all it takes us to build your matched shortlist</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS (AI pipeline) ============ -->
+  <section id="how-it-works" class="bg-mist py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-xl mb-14">
+        <p class="text-skyblue text-sm font-medium mb-4">How the matching works</p>
+        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight">Four AI models, one plain-language answer.</h2>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-2xl p-7 border border-navy/10 hover:border-skyblue hover:-translate-y-1.5 hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300">
+          <div class="w-10 h-10 rounded-lg bg-paleblue flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+          </div>
+          <h3 class="font-medium mb-2">Recommend</h3>
+          <p class="text-navy/60 text-sm leading-relaxed">Scores every plan against your profile — coverage, network, and add-ons — not just price.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-7 border border-navy/10 hover:border-skyblue hover:-translate-y-1.5 hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300">
+          <div class="w-10 h-10 rounded-lg bg-paleblue flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="font-medium mb-2">Predict</h3>
+          <p class="text-navy/60 text-sm leading-relaxed">Estimates your likely annual cost under each plan, from demographics and lifestyle inputs.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-7 border border-navy/10 hover:border-skyblue hover:-translate-y-1.5 hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300">
+          <div class="w-10 h-10 rounded-lg bg-paleblue flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <h3 class="font-medium mb-2">Segment</h3>
+          <p class="text-navy/60 text-sm leading-relaxed">Places you in a need/risk profile — young single, growing family, chronic care — to pre-filter noise.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-7 border border-navy/10 hover:border-skyblue hover:-translate-y-1.5 hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300">
+          <div class="w-10 h-10 rounded-lg bg-paleblue flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 4v-4z"/></svg>
+          </div>
+          <h3 class="font-medium mb-2">Explain</h3>
+          <p class="text-navy/60 text-sm leading-relaxed">Turns the model's reasoning into a short "why this plan" note you can actually read.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COST ESTIMATE PREVIEW (interactive-feel) ============ -->
+  <section class="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-14 items-center">
+    <div class="img-zoom rounded-2xl order-2 md:order-1">
+      <img
+        src="VIDEOS/imagedomain.jpg"
+        alt="An Indian family together in the evening"
+        class="w-full h-[420px] object-cover rounded-2xl">
+    </div>
+    <div class="order-1 md:order-2">
+      <p class="text-skyblue text-sm font-medium mb-4">See it before you commit</p>
+      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-6">Your estimated yearly cost, not just your monthly bill.</h2>
+      <p class="text-navy/70 leading-relaxed mb-8 max-w-md">
+        Every match comes with a projected annual cost — premium plus expected out-of-pocket spend —
+        so you're comparing total cost of care, not just the number on the label.
+      </p>
+
+      <div class="bg-paleblue rounded-2xl p-6">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-navy/70">Family Shield plan</span>
+          <span class="font-medium">₹41,000 / yr est.</span>
+        </div>
+        <div class="w-full bg-white rounded-full h-2.5 overflow-hidden mb-5">
+          <div class="gauge-fill bg-skyblue h-full rounded-full" style="width: 46%"></div>
+        </div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-navy/70">Complete Care plan</span>
+          <span class="font-medium">₹68,500 / yr est.</span>
+        </div>
+        <div class="w-full bg-white rounded-full h-2.5 overflow-hidden">
+          <div class="gauge-fill bg-navy2 h-full rounded-full" style="width: 68%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLANS ============ -->
+  <section id="plans" class="bg-mist py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-xl mb-14">
+        <p class="text-skyblue text-sm font-medium mb-4">Plans</p>
+        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight">Start free. Upgrade only if you need to.</h2>
+        <p id="planInfo" class="text-skyblue text-sm font-medium mt-4 h-5">Hover over a plan to see who it's best for.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" id="plansGrid">
+
+        <div class="plan-card group bg-white rounded-2xl border border-navy/10 p-8 hover:border-skyblue hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300" data-plan-info="Best for: anyone who just wants to see their match before committing to anything.">
+          <h3 class="font-display text-xl font-semibold mb-1">Free Check</h3>
+          <p class="text-navy/60 text-sm mb-6">See your match before you pay anything</p>
+          <p class="font-display text-3xl font-semibold mb-6">₹0<span class="text-base text-navy/50 font-sans font-normal">/mo</span></p>
+          <ul class="space-y-3 text-sm text-navy/70 mb-8">
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> One AI plan match report</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Estimated yearly cost preview</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> No card required</li>
+          </ul>
+          <a href="#match" class="block text-center border border-navy/20 rounded-lg py-2.5 group-hover:bg-skyblue group-hover:text-white group-hover:border-skyblue transition-colors duration-300">Get my free match</a>
+        </div>
+
+        <div class="plan-card group bg-white rounded-2xl border border-navy/10 p-8 hover:border-skyblue hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300" data-plan-info="Best for: young, healthy individuals who mainly want emergency and preventive cover.">
+          <h3 class="font-display text-xl font-semibold mb-1">Essential</h3>
+          <p class="text-navy/60 text-sm mb-6">For young, healthy, budget-first</p>
+          <p class="font-display text-3xl font-semibold mb-6">₹1,499<span class="text-base text-navy/50 font-sans font-normal">/mo</span></p>
+          <ul class="space-y-3 text-sm text-navy/70 mb-8">
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Preventive care covered fully</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Emergency coverage</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Telehealth included</li>
+          </ul>
+          <a href="#contact" class="block text-center border border-navy/20 rounded-lg py-2.5 group-hover:bg-skyblue group-hover:text-white group-hover:border-skyblue transition-colors duration-300">Explore Essential</a>
+        </div>
+
+        <div class="plan-card group bg-navy text-white rounded-2xl p-8 relative hover:shadow-xl hover:shadow-navy/20 hover:-translate-y-1 transition-all duration-300" data-plan-info="Best for: families with dependents who need specialist and maternity coverage.">
+          <span class="absolute -top-3 left-8 bg-skyblue text-navy text-xs font-medium px-3 py-1 rounded-full">Most matched</span>
+          <h3 class="font-display text-xl font-semibold mb-1">Family Shield</h3>
+          <p class="text-white/60 text-sm mb-6">For dependents, chronic care needs</p>
+          <p class="font-display text-3xl font-semibold mb-6">₹3,499<span class="text-base text-white/50 font-sans font-normal">/mo</span></p>
+          <ul class="space-y-3 text-sm text-white/75 mb-8">
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Everything in Essential</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Dependent coverage</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Specialist visits, low copay</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Maternity & pediatric care</li>
+          </ul>
+          <a href="#contact" class="block text-center bg-skyblue text-navy rounded-lg py-2.5 hover:bg-white transition-colors duration-300">Explore Family Shield</a>
+        </div>
+
+        <div class="plan-card group bg-white rounded-2xl border border-navy/10 p-8 hover:border-skyblue hover:shadow-xl hover:shadow-skyblue/10 transition-all duration-300" data-plan-info="Best for: comprehensive, long-term needs with zero-deductible hospital stays.">
+          <h3 class="font-display text-xl font-semibold mb-1">Complete Care</h3>
+          <p class="text-navy/60 text-sm mb-6">For comprehensive, long-term needs</p>
+          <p class="font-display text-3xl font-semibold mb-6">₹5,999<span class="text-base text-navy/50 font-sans font-normal">/mo</span></p>
+          <ul class="space-y-3 text-sm text-navy/70 mb-8">
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Everything in Family Shield</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Zero-deductible hospital stays</li>
+            <li class="flex gap-2"><span class="text-skyblue">✓</span> Nationwide provider network</li>
+          </ul>
+          <a href="#contact" class="block text-center border border-navy/20 rounded-lg py-2.5 group-hover:bg-skyblue group-hover:text-white group-hover:border-skyblue transition-colors duration-300">Explore Complete Care</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIDEO / STORY ============ -->
+  <section class="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <p class="text-skyblue text-sm font-medium mb-4">Two minutes, start to finish</p>
+      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-5">Watch how the match actually works.</h2>
+      <p class="text-navy/70 leading-relaxed mb-6 max-w-md">
+        No sales pitch — just a walkthrough of the questionnaire, the AI match, and the plain-language
+        explanation behind every recommendation.
+      </p>
+      <a href="#match" class="inline-flex items-center gap-2 text-sm border border-navy/20 rounded-lg px-6 py-3 hover:border-navy transition-colors duration-300">
+        Skip the video, start now
+      </a>
+    </div>
+    <div class="rounded-2xl overflow-hidden shadow-lg">
+      <video
+        class="w-full h-full object-cover"
+        controls
+        poster="https://images.unsplash.com/photo-1441308884981-677df19ca99b?auto=format&fit=crop&w=900&q=80">
+           <source src="VIDEOS/insurance-video.mp4" type="video/mp4">
+        Your browser does not support embedded video.
+      </video>
+    </div>
+  </section>
+
+  <!-- ============ LEARN (Tailwind Typography plugin + Speech Synthesis) ============ -->
+  <section id="learn" class="bg-mist py-20">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <p class="text-skyblue text-sm font-medium">Learn</p>
+        <button id="readArticleBtn" type="button" class="text-sm border border-navy/20 rounded-lg px-4 py-2 hover:border-skyblue transition-colors duration-300">🔊 Read this aloud</button>
+      </div>
+      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-10">Understanding your coverage</h2>
+
+      <article id="learnArticle" class="prose prose-slate max-w-none bg-white rounded-2xl p-8 md:p-10 prose-headings:font-display prose-a:text-skyblue">
+        <p>
+          Most people choose a plan by looking at the monthly premium and stopping there. That's a
+          reasonable first filter, but it misses the number that actually determines whether a plan
+          works for you: your <strong>out-of-pocket maximum</strong> — the most you'll pay in a bad
+          year before the plan covers the rest.
+        </p>
+        <h3>Premium vs. deductible vs. out-of-pocket maximum</h3>
+        <p>
+          The <em>premium</em> is what you pay every month regardless of whether you use care. The
+          <em>deductible</em> is what you pay before coverage kicks in for most services. The
+          <em>out-of-pocket maximum</em> is your ceiling — once you hit it, the plan covers 100% for
+          the rest of the year. A low-premium plan often has a high out-of-pocket maximum, which is
+          fine if you're healthy and risky if you're not.
+        </p>
+        <blockquote>
+          Rule of thumb: if you have dependents or a known condition, weigh the out-of-pocket maximum
+          more heavily than the premium.
+        </blockquote>
+        <h3>What our model actually optimizes for</h3>
+        <p>
+          Our matching model looks at your age, dependents, existing conditions, and typical care
+          usage, then estimates your likely annual cost under each plan — premium plus expected
+          out-of-pocket spend — rather than premium alone. That's why the "cheapest" plan on paper
+          isn't always the one we recommend first.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ FAQ (accordion) ============ -->
+  <section id="faq" class="bg-navy text-white py-20">
+    <div class="max-w-3xl mx-auto px-6">
+      <p class="text-skyblue text-sm font-medium mb-4">FAQ</p>
+      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-10">Common questions</h2>
+
+      <div class="divide-y divide-white/15 border-t border-b border-white/15">
+        <details class="group py-5">
+          <summary class="flex items-center justify-between cursor-pointer list-none">
+            <span class="font-medium">Is my current doctor covered?</span>
+            <svg class="chev w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-white/65 text-sm mt-3 leading-relaxed">You can check provider networks for each recommended plan before you enroll — we show this on every plan card during matching.</p>
+        </details>
+        <details class="group py-5">
+          <summary class="flex items-center justify-between cursor-pointer list-none">
+            <span class="font-medium">Can I change plans later?</span>
+            <svg class="chev w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-white/65 text-sm mt-3 leading-relaxed">Yes, during open enrollment or after a qualifying life event like marriage, a new child, or a job change.</p>
+        </details>
+        <details class="group py-5">
+          <summary class="flex items-center justify-between cursor-pointer list-none">
+            <span class="font-medium">How is the match decided?</span>
+            <svg class="chev w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-white/65 text-sm mt-3 leading-relaxed">We weigh your profile against each plan's coverage, network, and estimated out-of-pocket cost, then explain the top matches in plain language.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECURE ACCESS (Web Authentication API) ============ -->
+  <section id="secure-access" class="max-w-3xl mx-auto px-6 py-16 text-center">
+    <p class="text-skyblue text-sm font-medium mb-3">Returning users</p>
+    <h2 class="font-display text-2xl md:text-3xl font-semibold mb-4">Sign in with your fingerprint or face, not a password.</h2>
+    <p class="text-navy/60 text-sm mb-6 max-w-md mx-auto">
+      Uses your device's built-in biometric authenticator (Windows Hello, Touch ID, or Android biometrics)
+      through the Web Authentication API — no password to remember or leak.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3">
+      <button id="webauthnRegisterBtn" type="button" class="bg-navy text-white px-5 py-2.5 rounded-lg hover:bg-skyblue transition-colors duration-300">Set up biometric sign-in</button>
+      <button id="webauthnLoginBtn" type="button" class="border border-navy/20 px-5 py-2.5 rounded-lg hover:border-navy transition-colors duration-300">Sign in</button>
+    </div>
+    <p id="webauthnStatus" class="text-xs text-navy/50 mt-4"></p>
+  </section>
+
+  <!-- ============ CONTACT / CTA (File + Drag and Drop) ============ -->
+  <section id="contact" class="max-w-4xl mx-auto px-6 py-24 text-center">
+    <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-5">Six minutes to a plan that actually fits.</h2>
+    <p class="text-navy/70 max-w-md mx-auto mb-10">No sign-up required to see your matches. No calls unless you ask for one.</p>
+
+    <div id="dropZone" class="max-w-md mx-auto mb-10 border-2 border-dashed border-navy/25 rounded-2xl p-8 text-center transition-colors duration-300">
+      <p class="text-navy/70 text-sm mb-2">Drag & drop your ID proof or existing policy document here</p>
+      <p class="text-navy/40 text-xs mb-4">or</p>
+      <label for="fileInput" class="inline-block text-sm bg-white border border-navy/20 rounded-lg px-5 py-2.5 cursor-pointer hover:border-skyblue transition-colors duration-300">Browse files</label>
+      <input id="fileInput" type="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
+      <ul id="fileList" class="mt-4 text-sm text-navy/70 space-y-1 text-left max-w-xs mx-auto"></ul>
+    </div>
+
+    <a href="#match" class="inline-flex items-center gap-2 bg-navy text-white px-8 py-4 rounded-lg hover:bg-skyblue hover:text-navy transition-colors duration-300">
+      Start my match
+    </a>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-navy/10">
+  <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
+    <div class="md:col-span-2">
+      <div class="flex items-center gap-2.5 mb-4">
+        <span class="w-8 h-8 rounded-lg bg-navy flex items-center justify-center">
+          <svg class="w-4.5 h-4.5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3.5v5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5v-5L12 3z"/>
+          </svg>
+        </span>
+        <span class="font-display text-lg font-semibold">Insurance Experts</span>
+      </div>
+      <p class="text-navy/60 text-sm max-w-xs leading-relaxed">
+        AI-matched insurance guidance for individuals and families. Not a substitute for professional
+        financial or legal advice.
+      </p>
+    </div>
+    <div>
+      <p class="text-sm font-medium mb-4">Explore</p>
+      <ul class="space-y-2 text-sm text-navy/60">
+        <li><a href="#problem" class="hover:text-navy transition-colors">Why us</a></li>
+        <li><a href="#how-it-works" class="hover:text-navy transition-colors">How it works</a></li>
+        <li><a href="#plans" class="hover:text-navy transition-colors">Plans</a></li>
+        <li><a href="#faq" class="hover:text-navy transition-colors">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-sm font-medium mb-4">Contact</p>
+      <ul class="space-y-2 text-sm text-navy/60">
+        <li><a href="mailto:hello@insuranceexperts.example" class="hover:text-navy transition-colors">hello@insuranceexperts.example</a></li>
+        <li><a href="tel:+911234567890" class="hover:text-navy transition-colors">+91 12345 67890</a></li>
+        <li><a href="#contact" class="hover:text-navy transition-colors">Start my match</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-navy/10 py-6 text-center text-xs text-navy/50">
+    &copy; 2026 Insurance Experts. Built as an academic exercise — for demonstration purposes only.
+    <span class="mx-2">·</span>
+    <span id="screenWidthDisplay"></span>
+  </div>
+</footer>
+
+<script>
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', () => {
+    const isHidden = mobileMenu.classList.contains('hidden');
+    mobileMenu.classList.toggle('hidden');
+    menuBtn.setAttribute('aria-expanded', String(isHidden));
+  });
+</script>
+
+<!-- ============ EXERCISE 3: JAVASCRIPT EVENT HANDLING DEMOS ============ -->
+<script>
+  /* ---------------------------------------------------------------
+     EVENT 1: LOAD
+     Shows a one-time welcome banner once the page has fully loaded,
+     and lets the user dismiss it manually (click is just the close
+     control here — the demonstrated event is 'load').
+  --------------------------------------------------------------- */
+  window.addEventListener('load', () => {
+    const banner = document.getElementById('welcomeBanner');
+    if (banner) {
+      banner.classList.remove('hidden');
+      setTimeout(() => banner.classList.add('hidden'), 6000);
+    }
+  });
+  document.getElementById('dismissBannerBtn').addEventListener('click', () => {
+    document.getElementById('welcomeBanner').classList.add('hidden');
+  });
+
+  /* ---------------------------------------------------------------
+     EVENT 2: FOCUS / BLUR
+     Highlights each match-form field with a colored ring while the
+     user is actively filling it in, and removes the highlight once
+     they move to the next field — clearer visual guidance through
+     a fairly long form.
+  --------------------------------------------------------------- */
+  document.querySelectorAll('#matchForm input, #matchForm select, #matchForm textarea').forEach(field => {
+    field.addEventListener('focus', () => {
+      field.classList.add('ring-2', 'ring-skyblue', 'border-skyblue');
+    });
+    field.addEventListener('blur', () => {
+      field.classList.remove('ring-2', 'ring-skyblue', 'border-skyblue');
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     EVENT 3: KEYUP
+     Live character counter for the optional "notes for your
+     advisor" field, so the user can see how much room they have
+     left as they type.
+  --------------------------------------------------------------- */
+  const matchNotes = document.getElementById('matchNotes');
+  const notesCount = document.getElementById('notesCount');
+  matchNotes.addEventListener('keyup', () => {
+    notesCount.textContent = `${matchNotes.value.length}/200 characters`;
+  });
+
+  /* ---------------------------------------------------------------
+     EVENT 4: CHANGE
+     Updates a hint line when the user picks an insurance category,
+     so the form gives immediate feedback on what they've selected
+     without needing to submit first.
+  --------------------------------------------------------------- */
+  const matchCategory = document.getElementById('matchCategory');
+  const categoryHint = document.getElementById('categoryHint');
+  const categoryHints = {
+    health: "You're browsing individual health insurance plans.",
+    life: "You're browsing life insurance and term plans.",
+    family: "You're browsing family floater plans covering multiple dependents.",
+    senior: "You're browsing senior citizen health plans with age-specific coverage."
+  };
+  matchCategory.addEventListener('change', () => {
+    categoryHint.textContent = categoryHints[matchCategory.value] || '';
+  });
+
+  /* ---------------------------------------------------------------
+     EVENT 5: MOUSEOVER / MOUSEOUT
+     Shows who each plan is best suited for as the user hovers over
+     a plan card, and clears it when they move away — a quick way
+     to compare plans without clicking into each one.
+  --------------------------------------------------------------- */
+  const planInfo = document.getElementById('planInfo');
+  const defaultPlanInfoText = "Hover over a plan to see who it's best for.";
+  document.querySelectorAll('.plan-card').forEach(card => {
+    card.addEventListener('mouseover', () => {
+      planInfo.textContent = card.dataset.planInfo || defaultPlanInfoText;
+    });
+    card.addEventListener('mouseout', () => {
+      planInfo.textContent = defaultPlanInfoText;
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     EVENT 6: RESIZE
+     Displays the current viewport width live in the footer, useful
+     for demonstrating/verifying the page's responsive behavior.
+  --------------------------------------------------------------- */
+  const screenWidthDisplay = document.getElementById('screenWidthDisplay');
+  function updateScreenWidth() {
+    screenWidthDisplay.textContent = `Viewport: ${window.innerWidth}px`;
+  }
+  updateScreenWidth();
+  window.addEventListener('resize', updateScreenWidth);
+</script>
+
+<!-- ============ HTML5 API DEMOS ============ -->
+<script>
+  /* ---------------------------------------------------------------
+     1. LOCAL STORAGE API
+     Saves the "Get matched" form answers on this device so the user
+     can leave and come back later without retyping everything.
+  --------------------------------------------------------------- */
+  const matchForm = document.getElementById('matchForm');
+  const savedFields = ['matchName', 'matchAge', 'matchDependents', 'matchBudget', 'matchCity'];
+  const saveStatus = document.getElementById('saveStatus');
+  const STORAGE_PREFIX = 'insuranceExperts_';
+
+  function loadSavedAnswers() {
+    savedFields.forEach(id => {
+      const saved = localStorage.getItem(STORAGE_PREFIX + id);
+      if (saved !== null) {
+        const el = document.getElementById(id);
+        if (el) el.value = saved;
+      }
+    });
+  }
+  loadSavedAnswers();
+
+  savedFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', (e) => {
+      localStorage.setItem(STORAGE_PREFIX + id, e.target.value);
+      saveStatus.textContent = 'Saved on this device ✓';
+      clearTimeout(window._saveStatusTimer);
+      window._saveStatusTimer = setTimeout(() => { saveStatus.textContent = ''; }, 1500);
+    });
+  });
+
+  document.getElementById('clearMatchBtn').addEventListener('click', () => {
+    savedFields.forEach(id => {
+      localStorage.removeItem(STORAGE_PREFIX + id);
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    saveStatus.textContent = 'Cleared.';
+  });
+
+  /* ---------------------------------------------------------------
+     2. GEOLOCATION API
+     Detects the user's current location and reverse-geocodes it to
+     a city name (via a free public API), so the match form can be
+     personalized to their local hospital network.
+  --------------------------------------------------------------- */
+  const detectLocationBtn = document.getElementById('detectLocationBtn');
+  const locationStatus = document.getElementById('locationStatus');
+
+  detectLocationBtn.addEventListener('click', () => {
+    if (!('geolocation' in navigator)) {
+      locationStatus.textContent = 'Geolocation is not supported on this browser.';
+      return;
+    }
+    locationStatus.textContent = 'Detecting your location…';
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          const city = (data.address && (data.address.city || data.address.town || data.address.state_district || data.address.state)) || '';
+          if (city) {
+            document.getElementById('matchCity').value = city;
+            localStorage.setItem(STORAGE_PREFIX + 'matchCity', city);
+            locationStatus.textContent = `Detected: ${city}`;
+          } else {
+            locationStatus.textContent = 'Location detected, but city name unavailable.';
+          }
+        } catch (err) {
+          locationStatus.textContent = `Location found (${latitude.toFixed(2)}, ${longitude.toFixed(2)}) but could not resolve a city name.`;
+        }
+      },
+      (err) => {
+        locationStatus.textContent = 'Could not access your location: ' + err.message;
+      }
+    );
+  });
+
+  /* ---------------------------------------------------------------
+     3. CANVAS API
+     Draws a simple bar chart comparing the estimated yearly cost
+     across plans, redrawn live whenever the user submits the form.
+  --------------------------------------------------------------- */
+  function drawCostChart(estimate) {
+    const canvas = document.getElementById('costCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const bars = [
+      { label: 'Essential', value: estimate.essential, color: '#3E8EF7' },
+      { label: 'Family Shield', value: estimate.familyShield, color: '#0A1F44' },
+      { label: 'Complete Care', value: estimate.completeCare, color: '#0F2E5C' }
+    ];
+    const maxVal = Math.max(...bars.map(b => b.value));
+    const barWidth = 100;
+    const gap = 40;
+    const chartHeight = 140;
+    const baseY = 180;
+
+    bars.forEach((bar, i) => {
+      const x = 30 + i * (barWidth + gap);
+      const h = (bar.value / maxVal) * chartHeight;
+      ctx.fillStyle = bar.color;
+      ctx.fillRect(x, baseY - h, barWidth, h);
+
+      ctx.fillStyle = '#0A1F44';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(bar.label, x + barWidth / 2, baseY + 18);
+      ctx.fillText('₹' + bar.value.toLocaleString('en-IN'), x + barWidth / 2, baseY - h - 8);
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     FORM SUBMIT: a simple illustrative cost model, then render the
+     chart and build the summary text used by Clipboard/Speech below.
+     (Not a real actuarial calculation — for demo purposes only.)
+  --------------------------------------------------------------- */
+  const matchSummaryText = document.getElementById('matchSummaryText');
+  let lastSummary = '';
+
+  matchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    /* EVENT 7: SUBMIT — validate required fields before computing a match. */
+    const formError = document.getElementById('formError');
+    const ageInput = document.getElementById('matchAge');
+    const budgetInput = document.getElementById('matchBudget');
+
+    if (!ageInput.value || !budgetInput.value) {
+      formError.textContent = 'Please fill in at least your age and monthly budget before we can match you.';
+      formError.classList.remove('hidden');
+      (ageInput.value ? budgetInput : ageInput).focus();
+      return;
+    }
+    formError.classList.add('hidden');
+
+    const name = document.getElementById('matchName').value || 'there';
+    const age = Number(document.getElementById('matchAge').value) || 30;
+    const dependents = Number(document.getElementById('matchDependents').value) || 0;
+    const budget = Number(document.getElementById('matchBudget').value) || 2000;
+    const city = document.getElementById('matchCity').value || 'your city';
+
+    const estimate = {
+      essential: Math.round(12000 + age * 150),
+      familyShield: Math.round(28000 + age * 200 + dependents * 6000),
+      completeCare: Math.round(48000 + age * 260 + dependents * 8000)
+    };
+
+    let recommendedKey = 'essential';
+    let recommendedLabel = 'Essential';
+    if (dependents >= 1 && budget >= 3000) { recommendedKey = 'familyShield'; recommendedLabel = 'Family Shield'; }
+    if (dependents >= 2 && budget >= 5500) { recommendedKey = 'completeCare'; recommendedLabel = 'Complete Care'; }
+
+    drawCostChart(estimate);
+
+    lastSummary = `Hi ${name}, based on your profile (age ${age}, ${dependents} dependent(s), budget \u20B9${budget}/mo, based in ${city}), your best match is the ${recommendedLabel} plan, with an estimated yearly cost of \u20B9${estimate[recommendedKey].toLocaleString('en-IN')}.`;
+
+    matchSummaryText.textContent = lastSummary;
+  });
+
+  /* ---------------------------------------------------------------
+     4. CLIPBOARD API
+     Lets the user copy their match summary to paste elsewhere
+     (e.g. WhatsApp, to share with family before deciding).
+  --------------------------------------------------------------- */
+  document.getElementById('copySummaryBtn').addEventListener('click', async () => {
+    if (!lastSummary) {
+      matchSummaryText.textContent = 'Generate your match first, then copy the summary.';
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(lastSummary);
+      const btn = document.getElementById('copySummaryBtn');
+      const original = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    } catch (err) {
+      alert('Could not copy automatically — please select and copy the text manually.');
+    }
+  });
+
+  /* ---------------------------------------------------------------
+     5. WEB SPEECH API (Speech Synthesis)
+     Reads the match summary aloud, and separately reads the
+     "Understanding your coverage" article aloud — useful for users
+     who find dense insurance terms easier to absorb by ear.
+  --------------------------------------------------------------- */
+  document.getElementById('speakSummaryBtn').addEventListener('click', () => {
+    if (!('speechSynthesis' in window)) {
+      alert('Sorry, your browser does not support text-to-speech.');
+      return;
+    }
+    if (!lastSummary) {
+      matchSummaryText.textContent = 'Generate your match first, then use Read aloud.';
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(lastSummary);
+    utterance.rate = 0.95;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
+  });
+
+  document.getElementById('readArticleBtn').addEventListener('click', () => {
+    if (!('speechSynthesis' in window)) {
+      alert('Sorry, your browser does not support text-to-speech.');
+      return;
+    }
+    const text = document.getElementById('learnArticle').innerText;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
+  });
+
+  /* ---------------------------------------------------------------
+     6. FILE API + DRAG AND DROP API
+     Lets the user drop (or browse for) an ID proof / policy
+     document ahead of enrollment, and lists the selected file(s).
+  --------------------------------------------------------------- */
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const fileList = document.getElementById('fileList');
+
+  function renderFiles(files) {
+    fileList.innerHTML = '';
+    Array.from(files).forEach(file => {
+      const li = document.createElement('li');
+      li.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      fileList.appendChild(li);
+    });
+  }
+
+  fileInput.addEventListener('change', (e) => renderFiles(e.target.files));
+
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-active');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-active');
+    });
+  });
+  dropZone.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files && files.length) {
+      fileInput.files = files;
+      renderFiles(files);
+    }
+  });
+
+  /* ---------------------------------------------------------------
+     7. WEB AUTHENTICATION API
+     Client-side academic demo of biometric sign-in (Windows Hello /
+     Touch ID / Android biometrics) using the device's platform
+     authenticator. NOTE: a production system verifies the resulting
+     credential against a server; this demo only exercises the
+     browser API and stores the credential ID locally for the
+     "sign in" step to check against, since there is no backend here.
+  --------------------------------------------------------------- */
+  const webauthnStatus = document.getElementById('webauthnStatus');
+
+  function randomChallenge() {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return arr;
+  }
+
+  function base64urlToUint8Array(base64url) {
+    const padding = '='.repeat((4 - (base64url.length % 4)) % 4);
+    const base64 = (base64url + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base64);
+    const arr = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    return arr;
+  }
+
+  document.getElementById('webauthnRegisterBtn').addEventListener('click', async () => {
+    if (!window.PublicKeyCredential) {
+      webauthnStatus.textContent = 'Biometric sign-in is not supported on this device/browser.';
+      return;
+    }
+    try {
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: randomChallenge(),
+          rp: { name: 'Insurance Experts' },
+          user: {
+            id: randomChallenge(),
+            name: 'demo-user@insuranceexperts.example',
+            displayName: 'Demo User'
+          },
+          pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+          authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+          timeout: 60000
+        }
+      });
+      localStorage.setItem(STORAGE_PREFIX + 'credentialId', credential.id);
+      webauthnStatus.textContent = 'Biometric sign-in set up on this device ✓';
+    } catch (err) {
+      webauthnStatus.textContent = 'Setup cancelled or unavailable: ' + err.message;
+    }
+  });
+
+  document.getElementById('webauthnLoginBtn').addEventListener('click', async () => {
+    if (!window.PublicKeyCredential) {
+      webauthnStatus.textContent = 'Biometric sign-in is not supported on this device/browser.';
+      return;
+    }
+    const savedId = localStorage.getItem(STORAGE_PREFIX + 'credentialId');
+    if (!savedId) {
+      webauthnStatus.textContent = 'No biometric sign-in set up yet on this device — click "Set up" first.';
+      return;
+    }
+    try {
+      await navigator.credentials.get({
+        publicKey: {
+          challenge: randomChallenge(),
+          allowCredentials: [{ id: base64urlToUint8Array(savedId), type: 'public-key' }],
+          userVerification: 'required',
+          timeout: 60000
+        }
+      });
+      webauthnStatus.textContent = 'Signed in successfully ✓';
+    } catch (err) {
+      webauthnStatus.textContent = 'Sign-in failed or cancelled: ' + err.message;
+    }
+  });
+</script>
+
+</body>
+</html>
